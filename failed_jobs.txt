@@ -1,5 +1,0 @@
-
-================================================================================
-Job ID: 67fd70a5b0eca1667ae93c3c
-Title: Senior Full-Stack Software Engineer
-Error: Scraping failed
