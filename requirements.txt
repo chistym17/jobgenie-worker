@@ -3,3 +3,8 @@ uvicorn[standard]
 qdrant-client
 python-dotenv
 requests
+pymongo
+playwright==1.40.0
+fake-useragent
+firecrawl-py
+beautifulsoup4
