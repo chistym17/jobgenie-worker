@@ -1,3 +1,4 @@
+# to structure the job data and clean them
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv

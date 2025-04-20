@@ -3,6 +3,8 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 
+from worker.db import fetch_resume_data
+
 load_dotenv()
 
 class JobRecommendationLLM:

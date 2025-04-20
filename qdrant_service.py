@@ -33,7 +33,7 @@ def insert_document(id: int, embedding: list[float], payload: dict):
         ]
     )
 
-def search_similar(text_embedding: list[float], top_k: int = 3):
+def search_similar(text_embedding: list[float], top_k: int = 5):
     results = client.search(
         collection_name=COLLECTION_NAME,
         query_vector=text_embedding,
