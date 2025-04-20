@@ -1,3 +1,4 @@
+##to ptocess and save all data to qdrant
 import time
 import json
 from datetime import datetime
