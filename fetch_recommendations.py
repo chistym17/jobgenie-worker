@@ -54,7 +54,7 @@ def fetch_recommendations(user_email: str):
     resume = fetch_resume_data(user_email)
     if not resume:
         return []
-    print(resume)
+        
     relevant_text = extract_relevant_resume_text(resume)
     chunks = chunk_text(relevant_text, max_length=500)
     embeddings = []

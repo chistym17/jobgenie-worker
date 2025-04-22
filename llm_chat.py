@@ -3,7 +3,8 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-from worker.db import fetch_resume_data
+from fetch_recommendations import fetch_recommendations
+from db import fetch_resume_data
 
 load_dotenv()
 
@@ -141,7 +142,6 @@ User Query:
         try:
             response = self.model.generate_content(messages, stream=True)
 
-            print(response)
             
             # Process streaming response
             for chunk in response:
@@ -166,13 +166,23 @@ User Query:
             full_response.append(chunk)
         return ''.join(full_response)
 
+def scoredpoints_to_job_descriptions(scored_points):
+    job_descriptions = []
+    for point in scored_points:
+        payload = getattr(point, 'payload', {})
+        job = payload.get('job', {})
+        desc = f"{job.get('title', '')} at {job.get('company', '')}: {job.get('description', '')}"
+        job_descriptions.append(desc)
+    return job_descriptions
+
 async def main():
     llm = JobRecommendationLLM()
-    resume_text = "Experienced Python developer with expertise in machine learning and data analysis."
-    job_descriptions = ["Software Engineer (Python, ML), Senior Data Scientist"]
+    resume = fetch_resume_data("demouser17@gmail.com")
+    recommendated_jobs_data = fetch_recommendations("demouser17@gmail.com")
+    job_descriptions = scoredpoints_to_job_descriptions(recommendated_jobs_data)
     user_query = "What job recommendations do you have for me?"
 
-    recommendation = await llm.get_single_recommendation(resume_text, job_descriptions, user_query)
+    recommendation = await llm.get_single_recommendation(resume, job_descriptions, user_query)
     print(recommendation)
 
 if __name__ == "__main__":
