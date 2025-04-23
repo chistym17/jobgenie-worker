@@ -67,9 +67,9 @@ def fetch_recommendations(user_email: str):
     else:
         embedding = []
     fetched_chunks = search_similar(embedding)
-    print(fetched_chunks)
 
     return fetched_chunks
+
 
 
 if __name__ == "__main__":

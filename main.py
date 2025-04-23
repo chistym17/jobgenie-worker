@@ -1,18 +1,20 @@
-from embedder import get_embedding
-from qdrant_service import init_collection, insert_document, search_similar
+from agents.recommender_agent import recommender_agent
+from agents.Tasks import recommendation_task
+from crewai import Crew
+
+recommender_crew = Crew(
+    agents=[recommender_agent],
+    tasks=[recommendation_task],
+    verbose=True
+)
+    
+
+
+
+user_email = "demouser17@gmail.com"
+
+result = recommender_crew.kickoff(inputs={"email": user_email})
 
 if __name__ == "__main__":
-    init_collection()
-
-    text = "Qdrant is a vector database"
-    embedding = get_embedding(text)
-    print(embedding[:10])
-    insert_document(id=1, embedding=embedding, payload={"text": text})
-
-    query = "Database for embeddings"
-    query_embedding = get_embedding(query)
-    results = search_similar(query_embedding)
-
-    print("Top matches:")
-    for hit in results:
-        print(f"Score: {hit.score:.4f}, Payload: {hit.payload}")
+    recommender_crew.kickoff(inputs={"email": user_email})
+    print(result)
