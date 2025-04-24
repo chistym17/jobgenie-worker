@@ -51,6 +51,7 @@ def extract_relevant_resume_text(resume):
 @router.get("/fetch_recommendations")
 
 def fetch_recommendations(user_email: str):
+    print("Fetching recommendations for user:", user_email)
     resume = fetch_resume_data(user_email)
     if not resume:
         return []
@@ -67,6 +68,8 @@ def fetch_recommendations(user_email: str):
     else:
         embedding = []
     fetched_chunks = search_similar(embedding)
+
+    print(fetched_chunks)
 
     return fetched_chunks
 
