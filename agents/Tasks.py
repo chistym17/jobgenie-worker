@@ -1,6 +1,5 @@
 from crewai import Task
 from agents.recommender_agent import recommender_agent
-from agents.tools import FetchRecommendationsTool
 
 def create_recommendation_task(user_email):
     return Task(
@@ -8,10 +7,11 @@ def create_recommendation_task(user_email):
             f"Process the user email: {user_email}. "
             "Use the `FetchRecommendationsTool` to fetch the recommendations chunks, "
             "and organize them into structured recommendations. "
-            "Each result should include the job title, short description, and why it fits the user's profile."
+            "For each job, include: Job Title, Company Name, Location, Job Type, Salary, Posted Date, Application Deadline, Key Requirements, Bonus Skills, Stack, Description, How to Apply, Direct Link, and Match Score as a percentage."
         ),
         expected_output=(
-            "A clean, markdown-formatted list of 5 job recommendations, with id,company_name,title, summaries, and personalized reasoning."
+            "A clean, markdown-formatted list of 5 job recommendations. "
+            "Each job must include: Job Title, Company Name, Location, Job Type, Salary, Posted Date, Application Deadline, Key Requirements, Bonus Skills, Stack, Description, How to Apply, Direct Link, and Match Score as a percentage."
         ),
         agent=recommender_agent,
         async_execution=False,
