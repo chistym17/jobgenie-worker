@@ -28,7 +28,7 @@
       "REST APIs",
       "AWS (Lambda, S3, etc.)"
     ],
-    "Description": "We’re looking for a senior-level full-stack dev who knows the MERN stack inside out and is still very much in the code.\nThis isn’t a management role. You’ll be contributing directly — writing code, shaping architecture, and helping us build out real product features. You’ll work closely with our IT technical team. You’ll have a voice in decisions, but we expect you to ship and stay hands-on.\nWhat You’ll Be Working On:\nWe’re building a modern workforce management platform for field service teams — real-world use cases like install tracking, dispatch, mobile work orders, photo verification, etc. It’s not a toy app or another dashboard overlay — we’re solving actual ops problems with a lean team and strong stack.",
+    "Description": "We’re looking for a senior-level full-stack dev who knows the MERN stack inside out and is still very much in the code.\\nThis isn’t a management role. You’ll be contributing directly — writing code, shaping architecture, and helping us build out real product features. You’ll work closely with our IT technical team. You’ll have a voice in decisions, but we expect you to ship and stay hands-on.\\nWhat You’ll Be Working On:\\nWe’re building a modern workforce management platform for field service teams — real-world use cases like install tracking, dispatch, mobile work orders, photo verification, etc. It’s not a toy app or another dashboard overlay — we’re solving actual ops problems with a lean team and strong stack.",
     "How to Apply": [
       "A link to your GitHub or portfolio (real work, not tutorial clones)",
       "What you're best at, and what kind of problems you like solving",

@@ -214,11 +214,27 @@ async def chat_websocket(websocket: WebSocket):
             data = await websocket.receive_text()
             try:
                 payload = json.loads(data)
+                print(payload)
                 msg_type = payload.get("type", "general")
                 message = payload.get("message", "")
                 job = payload.get("job", None)
                 if msg_type == "explain":
-                    reply = f"[MOCK] This job is a good fit for you because you match key requirements: {', '.join(job.get('reasons', [])) if job else ''}"
+                    # Get email from payload.job
+                    email = job.get("email") if job else None
+                    if not email:
+                        reply = "[ERROR] No email provided in job payload."
+                    else:
+                        user_resume = fetch_resume_data(email)
+                        job_obj = find_job_by_title_and_company(job.get("title"), job.get("company"))
+
+                        print(job_obj)
+                        
+                        if not user_resume:
+                            reply = f"[ERROR] Resume not found for {email}."
+                        else:
+                            # Run explainer crew agent
+                            explanation = run_crew_for_explanation(job_obj, user_resume)
+                            reply = explanation
                 elif msg_type == "suggest":
                     reply = f"[MOCK] To improve your application for {job.get('title', 'this job')}, consider tailoring your resume and highlighting relevant skills."
                 else:
