@@ -57,7 +57,7 @@
       "React"
     ],
     "Description": "Lumenalta is a forward-thinking IT consultancy helping businesses build scalable software, optimize cloud infrastructure, and harness the power of data and AI. They are a remote-first team. The role involves collaborating with visionary enterprise clients, creating transformative digital products, learning how to handle difficult situations, tackling complex challenges at scale, and pushing boundaries with emerging technologies.",
-    "How to Apply": null,
+    "How to Apply": "https://lumenalta.com/jobs/senior-fullstack-javascript/apply",
     "Direct Link": null,
     "Match Score": 51
   },

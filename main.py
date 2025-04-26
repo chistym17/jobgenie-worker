@@ -206,6 +206,30 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"WebSocket error: {e}")
         await websocket.close()
 
+@app.websocket("/ws/chat")
+async def chat_websocket(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_text()
+            try:
+                payload = json.loads(data)
+                msg_type = payload.get("type", "general")
+                message = payload.get("message", "")
+                job = payload.get("job", None)
+                if msg_type == "explain":
+                    reply = f"[MOCK] This job is a good fit for you because you match key requirements: {', '.join(job.get('reasons', [])) if job else ''}"
+                elif msg_type == "suggest":
+                    reply = f"[MOCK] To improve your application for {job.get('title', 'this job')}, consider tailoring your resume and highlighting relevant skills."
+                else:
+                    reply = f"[MOCK] You said: {message}"
+            except Exception as e:
+                reply = f"[MOCK] Sorry, I could not process your message. ({e})"
+            await websocket.send_json({"reply": reply})
+    except Exception as e:
+        print(f"WebSocket error (chat): {e}")
+        await websocket.close()
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
