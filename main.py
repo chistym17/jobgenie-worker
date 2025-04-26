@@ -7,7 +7,8 @@ import json
 from typing import List, Dict, Any
 from agents.recommender_agent import recommender_agent
 from agents.explainer_agent import explainer_agent
-from agents.Tasks import create_recommendation_task, create_explanation_task
+from agents.resume_advisor_agent import resume_advisor_agent
+from agents.Tasks import create_recommendation_task, create_explanation_task, create_resume_advice_task
 from crewai import Crew
 from db import fetch_resume_data
 import bson
@@ -116,6 +117,18 @@ def run_crew_for_explanation(job_object, user_resume):
     result = explainer_crew.kickoff(inputs={"job_object": job_object, "user_resume": user_resume})
     explanation = result.final_answer if hasattr(result, "final_answer") else str(result.raw)
     return explanation
+
+def run_crew_for_advice(job_object, user_resume):
+    user_resume = sanitize_resume(user_resume)
+    advice_task = create_resume_advice_task(job_object, user_resume)
+    advisor_crew = Crew(
+        agents=[resume_advisor_agent],
+        tasks=[advice_task],
+        verbose=True
+    )
+    result = advisor_crew.kickoff(inputs={"job_object": job_object, "user_resume": user_resume})
+    advice = result.final_answer if hasattr(result, "final_answer") else str(result.raw)
+    return advice
 
 def find_job_by_title_and_company(job_title: str, company_name: str):
     """
@@ -228,7 +241,7 @@ async def chat_websocket(websocket: WebSocket):
                         job_obj = find_job_by_title_and_company(job.get("title"), job.get("company"))
 
                         print(job_obj)
-                        
+
                         if not user_resume:
                             reply = f"[ERROR] Resume not found for {email}."
                         else:
@@ -236,7 +249,18 @@ async def chat_websocket(websocket: WebSocket):
                             explanation = run_crew_for_explanation(job_obj, user_resume)
                             reply = explanation
                 elif msg_type == "suggest":
-                    reply = f"[MOCK] To improve your application for {job.get('title', 'this job')}, consider tailoring your resume and highlighting relevant skills."
+                    email = job.get("email") if job else None
+                    if not email:
+                        reply = "[ERROR] No email provided in job payload."
+                    else:
+                        user_resume = fetch_resume_data(email)
+                        job_obj = find_job_by_title_and_company(job.get("title"), job.get("company"))
+                        if not user_resume:
+                            reply = f"[ERROR] Resume not found for {email}."
+                        else:
+                            # Run advisor crew agent
+                            advice = run_crew_for_advice(job_obj, user_resume)
+                            reply = advice
                 else:
                     reply = f"[MOCK] You said: {message}"
             except Exception as e:

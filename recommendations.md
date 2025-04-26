@@ -28,7 +28,7 @@
       "REST APIs",
       "AWS (Lambda, S3, etc.)"
     ],
-    "Description": "We’re looking for a senior-level full-stack dev who knows the MERN stack inside out and is still very much in the code.\\nThis isn’t a management role. You’ll be contributing directly — writing code, shaping architecture, and helping us build out real product features. You’ll work closely with our IT technical team. You’ll have a voice in decisions, but we expect you to ship and stay hands-on.\\nWhat You’ll Be Working On:\\nWe’re building a modern workforce management platform for field service teams — real-world use cases like install tracking, dispatch, mobile work orders, photo verification, etc. It’s not a toy app or another dashboard overlay — we’re solving actual ops problems with a lean team and strong stack.",
+    "Description": "We’re looking for a senior-level full-stack dev who knows the MERN stack inside out and is still very much in the code.\nThis isn’t a management role. You’ll be contributing directly — writing code, shaping architecture, and helping us build out real product features. You’ll work closely with our IT technical team. You’ll have a voice in decisions, but we expect you to ship and stay hands-on.\nWhat You’ll Be Working On:\nWe’re building a modern workforce management platform for field service teams — real-world use cases like install tracking, dispatch, mobile work orders, photo verification, etc. It’s not a toy app or another dashboard overlay — we’re solving actual ops problems with a lean team and strong stack.",
     "How to Apply": [
       "A link to your GitHub or portfolio (real work, not tutorial clones)",
       "What you're best at, and what kind of problems you like solving",
@@ -57,8 +57,8 @@
       "React"
     ],
     "Description": "Lumenalta is a forward-thinking IT consultancy helping businesses build scalable software, optimize cloud infrastructure, and harness the power of data and AI. They are a remote-first team. The role involves collaborating with visionary enterprise clients, creating transformative digital products, learning how to handle difficult situations, tackling complex challenges at scale, and pushing boundaries with emerging technologies.",
-    "How to Apply": "https://lumenalta.com/jobs/senior-fullstack-javascript/apply",
-    "Direct Link": null,
+    "How to Apply": null,
+    "Direct Link": "https://lumenalta.com/jobs/senior-fullstack-javascript/apply",
     "Match Score": 51
   },
   {
@@ -114,7 +114,7 @@
       "Feedback.",
       "Magic Box: Finding the best project for you."
     ],
-    "Direct Link": null,
+    "Direct Link": "https://lemon.io/for-developers/?utm_source=weworkremotely&utm_medium=job_ad&utm_campaign=supply_en_ai_apr_2025_job_ad/",
     "Match Score": 40
   },
   {
@@ -172,7 +172,7 @@
       "Feedback.",
       "Project Matching."
     ],
-    "Direct Link": null,
+    "Direct Link": "https://weworkremotely.com/listings/lemon-io-senior-ai-engineer-3",
     "Match Score": 39
   },
   {

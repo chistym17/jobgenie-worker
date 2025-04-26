@@ -1,6 +1,7 @@
 from crewai import Task
 from agents.recommender_agent import recommender_agent
 from agents.explainer_agent import explainer_agent
+from agents.resume_advisor_agent import resume_advisor_agent
 
 def create_recommendation_task(user_email):
     return Task(
@@ -48,3 +49,26 @@ def create_explanation_task(job_object, user_resume):
         async_execution=False
     )
 
+
+
+def create_resume_advice_task(job_object, user_resume):
+    return Task(
+        description=(
+            f"""
+            You are an expert resume advisor.
+            You will receive a job description and a user's resume as input.
+            Analyze the job requirements, responsibilities, and desired skills from the job description: {job_object}, and carefully review the user's resume: {user_resume}.
+            Identify any gaps, weaknesses, or areas for improvement that would make the resume better aligned with the job.
+            Provide clear, specific suggestions on how the user can improve their resume — such as adding missing skills, emphasizing relevant experiences, adjusting wording to better match the job description, or reordering sections to highlight strengths.
+            Your advice should directly reference elements from the resume and job description.
+            Always address the user directly as "you" — do not refer to them as "the candidate" or "he/she."
+            Your final output MUST be a single, clear paragraph (no bullet points, no markdown, no extraneous text), offering constructive and actionable feedback.
+            Only return the advice text, and nothing else.
+            """
+        ),
+        expected_output=(
+            "A single, well-structured paragraph giving specific, actionable advice for improving the user's resume to better match the job description."
+        ),
+        agent=resume_advisor_agent,
+        async_execution=False
+    )
