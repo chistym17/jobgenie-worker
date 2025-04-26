@@ -5,6 +5,9 @@ from embedder import get_embedding
 import numpy as np
 import re
 
+# In-memory cache for user resumes
+resume_cache = {}
+
 router = APIRouter()
 
 def chunk_text(text, max_length=500):
@@ -50,7 +53,6 @@ def extract_relevant_resume_text(resume):
 
 @router.get("/fetch_recommendations")
 def fetch_recommendations(user_email: str):
-    print("Fetching recommendations for user:", user_email)
     resume = fetch_resume_data(user_email)
     if not resume:
         return []
@@ -67,6 +69,7 @@ def fetch_recommendations(user_email: str):
     else:
         embedding = []
     fetched_chunks = search_similar(embedding)
+
 
 
     return fetched_chunks

@@ -16,5 +16,4 @@ class FetchRecommendationsTool(BaseTool):
     args_schema: Type[BaseModel] = RecommendationInput
 
     def _run(self, email: str) -> str:
-        print("FetchRecommendationsTool received email:", email)
         return fetch_recommendations(email)

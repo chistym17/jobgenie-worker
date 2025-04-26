@@ -1,5 +1,6 @@
 from crewai import Task
 from agents.recommender_agent import recommender_agent
+from agents.explainer_agent import explainer_agent
 
 def create_recommendation_task(user_email):
     return Task(
@@ -22,5 +23,28 @@ def create_recommendation_task(user_email):
         ),
         agent=recommender_agent,
         async_execution=False,
-        output_file="recommendations.md", # Removed - not needed for the API
+        output_file="recommendations.md", 
     )
+
+def create_explanation_task(job_object, user_resume):
+    return Task(
+        description=(
+            f"""
+            You are an expert job match explainer.
+            You will receive a job object and a user's resume as input.
+            Analyze the job requirements, responsibilities, and desired skills from the job object: {job_object}, and compare them carefully with the user's experience, skills, and background from the resume: {user_resume}.
+            Write a clear, concise explanation that *directly compares* the job posting with the user's profile: for each major requirement, explain how the user meets it, referencing specific experiences, skills, or achievements.
+            Your explanation should follow this pattern: "The job requires [requirement], and you have [matching skill/experience]."
+            Always address the user directly as "you" — do not use their name, and do not refer to them as "the candidate" or "he/she."
+            If the user lacks any skills, explain how their transferable skills can help cover the gap.
+            Your final output MUST be a single, well-structured paragraph (no bullet points, no markdown, no extraneous text).
+            Only return the explanation text, and nothing else.
+            """
+        ),
+        expected_output=(
+            "A single, well-structured paragraph that directly compares the job requirements and the user's skills and experience, highlighting matches and addressing any gaps."
+        ),
+        agent=explainer_agent,
+        async_execution=False
+    )
+

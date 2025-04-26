@@ -40,7 +40,7 @@ def fetch_resume_data(user_email: str) -> dict:
     resume = collection.find_one({"user_email": user_email})
     
     client.close()
-    
+
     return resume
 
 if __name__ == '__main__':
