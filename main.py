@@ -29,29 +29,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def clean_crew_output(raw):
-    s = raw.strip()
-    if s.startswith('```json'):
-        s = s[len('```json'):].strip()
-    if s.startswith('```'):
-        s = s[len('```'):].strip()
-    if s.endswith('```'):
-        s = s[:-3].strip()
-    return s
-
-
-def sanitize_resume(resume):
-    if isinstance(resume, dict):
-        return {k: sanitize_resume(v) for k, v in resume.items()}
-    elif isinstance(resume, list):
-        return [sanitize_resume(i) for i in resume]
-    elif hasattr(resume, 'binary') or 'bson' in str(type(resume)):
-        return str(resume)
-    elif isinstance(resume, (datetime.datetime, datetime.date)):
-        return resume.isoformat()
-    else:
-        return resume
-
 
 
 def find_job_by_title_and_company(job_title: str, company_name: str):
@@ -132,7 +109,6 @@ async def chat_websocket(websocket: WebSocket):
                 message = payload.get("message", "")
                 job = payload.get("job", None)
                 if msg_type == "explain":
-                    # Get email from payload.job
                     email = job.get("email") if job else None
                     if not email:
                         reply = "[ERROR] No email provided in job payload."
@@ -140,12 +116,9 @@ async def chat_websocket(websocket: WebSocket):
                         user_resume = fetch_resume_data(email)
                         job_obj = find_job_by_title_and_company(job.get("title"), job.get("company"))
 
-                        print(job_obj)
-
                         if not user_resume:
                             reply = f"[ERROR] Resume not found for {email}."
                         else:
-                            # Run explainer crew agent
                             explanation = run_crew_for_explanation(job_obj, user_resume)
                             reply = explanation
                 elif msg_type == "suggest":
@@ -158,7 +131,6 @@ async def chat_websocket(websocket: WebSocket):
                         if not user_resume:
                             reply = f"[ERROR] Resume not found for {email}."
                         else:
-                            # Run advisor crew agent
                             advice = run_crew_for_advice(job_obj, user_resume)
                             reply = advice
                 else:

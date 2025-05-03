@@ -9,6 +9,7 @@ from agents.recommender_agent import recommender_agent
 from agents.explainer_agent import explainer_agent
 from agents.resume_advisor_agent import resume_advisor_agent
 from agents.Tasks import create_recommendation_task, create_explanation_task, create_resume_advice_task
+from utils.funcs import clean_crew_output, sanitize_resume
 from crewai import Crew
 from db import fetch_resume_data
 import bson
@@ -23,7 +24,6 @@ def run_crew_for_recommendations(email: str):
     recommender_crew = Crew(
         agents=[recommender_agent],
         tasks=[recommendation_task],
-        verbose=True
     )
     result = recommender_crew.kickoff(inputs={"email": email})
     jobs_str = result.final_answer if hasattr(result, "final_answer") else str(result.raw)
@@ -41,7 +41,6 @@ def run_crew_for_explanation(job_object, user_resume):
     explainer_crew = Crew(
         agents=[explainer_agent],
         tasks=[explanation_task],
-        verbose=True
     )
     result = explainer_crew.kickoff(inputs={"job_object": job_object, "user_resume": user_resume})
     explanation = result.final_answer if hasattr(result, "final_answer") else str(result.raw)
@@ -53,7 +52,6 @@ def run_crew_for_advice(job_object, user_resume):
     advisor_crew = Crew(
         agents=[resume_advisor_agent],
         tasks=[advice_task],
-        verbose=True
     )
     result = advisor_crew.kickoff(inputs={"job_object": job_object, "user_resume": user_resume})
     advice = result.final_answer if hasattr(result, "final_answer") else str(result.raw)

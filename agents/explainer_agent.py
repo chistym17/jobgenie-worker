@@ -10,7 +10,6 @@ explainer_agent = Agent(
         "You help users understand why they are a strong fit for a job by referencing their resume and the job's requirements. "
         "You always write in a clear, professional, and encouraging tone."
     ),
-    verbose=True,
     allow_delegation=False,
     llm=gemini_llm
 )

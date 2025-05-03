@@ -11,7 +11,6 @@ resume_advisor_agent = Agent(
         "and recommending changes in wording, skills, formatting, or emphasis to maximize the candidate's chances. "
         "Your advice is professional, specific, and constructive, aiming to empower users to present themselves in the best possible way."
     ),
-    verbose=True,
     allow_delegation=False,
     llm=gemini_llm
 )

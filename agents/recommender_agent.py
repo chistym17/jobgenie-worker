@@ -21,7 +21,6 @@ recommender_agent = Agent(
     ),
     tools=[fetch_recommendations_tool],
     result_as_answer=True,
-    verbose=True,
     allow_delegation=False,
     llm=gemini_llm
 )
