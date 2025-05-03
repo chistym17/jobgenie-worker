@@ -1,12 +1,12 @@
-##to ptocess and save all data to qdrant
+##to process,embed and save all data to qdrant
 import time
 import json
 from datetime import datetime
-from job_crawler import JobCrawler
-from llm_processor import JobLLMProcessor
+from utils.job_crawler import JobCrawler
+from utils.llm_processor import JobLLMProcessor
 from db import fetch_all_jobs
-from embedder import get_embedding
-from qdrant_service import init_collection, insert_document
+from utils.embedder import get_embedding
+from utils.qdrant_service import init_collection, insert_document
 import asyncio
 from typing import Dict, List
 import os
@@ -119,7 +119,6 @@ class JobProcessor:
                 'error': str(e)
             })
         
-        # Rate limiting
         time.sleep(RATE_LIMIT_DELAY)
 
     async def process_and_upload_jobs(self) -> None:
@@ -128,33 +127,14 @@ class JobProcessor:
         self._log("Starting job processing pipeline...")
 
         try:
-            # Fetch all jobs from database
             jobs = fetch_all_jobs()
             self._log(f"Found {len(jobs)} jobs in MongoDB")
             
-            # Process only first 5 jobs for testing
             jobs_to_process = jobs
             self._log(f"Processing first {len(jobs_to_process)} jobs for testing")
             
-            # Process each job with rate limiting
             for job in jobs_to_process:
                 await self.process_job(job)
-
-            # Write results to text files
-            with open('processed_jobs.txt', 'w') as f:
-                for job in self.processed_jobs:
-                    f.write("\n" + "="*80 + "\n")
-                    f.write(f"Title: {job['title']}\n")
-                    f.write("\nProcessed Data:\n")
-                    for key, value in job['data'].items():
-                        f.write(f"- {key}: {value}\n")
-                    f.write("\n")
-            
-            with open('failed_jobs.txt', 'w') as f:
-                for job in self.failed_jobs:
-                    f.write("\n" + "="*80 + "\n")
-                    f.write(f"Title: {job['title']}\n")
-                    f.write(f"Error: {job['error']}\n")
 
         except Exception as e:
             self._log(f"Pipeline failed with error: {str(e)}")

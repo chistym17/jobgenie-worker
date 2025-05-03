@@ -42,9 +42,3 @@ def fetch_resume_data(user_email: str) -> dict:
     client.close()
 
     return resume
-
-if __name__ == '__main__':
-    jobs = fetch_all_jobs()
-    resume = fetch_resume_data('demouser17@gmail.com')
-    print(f"Found {len(jobs)} jobs")
-    print(f"Found {resume} resume")

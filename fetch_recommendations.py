@@ -1,7 +1,7 @@
 from db import fetch_all_jobs, fetch_resume_data
 from fastapi import APIRouter
-from qdrant_service import search_similar
-from embedder import get_embedding
+from utils.qdrant_service import search_similar
+from utils.embedder import get_embedding
 import numpy as np
 import re
 
