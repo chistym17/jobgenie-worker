@@ -7,8 +7,8 @@ load_dotenv()
 
 gemini_llm = LLM(
     model="gemini/gemini-2.0-flash",
-    provider="google_ai",  # Or "gemini" - try "google" first, then "gemini" if that doesn't work
+    provider="google_ai",  
     api_key=os.getenv("GOOGLE_API_KEY"),
-    verbose=True, # Add verbose here to debug litellm messages too.  Handy!
-    model_kwargs={"temperature": 0.5} # Move temperature here
+    verbose=True, 
+    model_kwargs={"temperature": 0.5} 
 )
