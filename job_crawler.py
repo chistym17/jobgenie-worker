@@ -1,3 +1,4 @@
+## firecrawl to scrape job details--used to get job descriptions and all data
 from firecrawl import FirecrawlApp
 from typing import Dict, Optional, List
 import os

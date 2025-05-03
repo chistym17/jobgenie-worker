@@ -133,7 +133,7 @@ class JobProcessor:
             self._log(f"Found {len(jobs)} jobs in MongoDB")
             
             # Process only first 5 jobs for testing
-            jobs_to_process = jobs[10:15]
+            jobs_to_process = jobs
             self._log(f"Processing first {len(jobs_to_process)} jobs for testing")
             
             # Process each job with rate limiting
