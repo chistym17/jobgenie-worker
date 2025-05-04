@@ -13,7 +13,7 @@ gunicorn
 google-generativeai
 crewai
 langchain
-langchain_google_genai==2.1.4
+langchain_google_genai
 numpy
 pydantic
 
