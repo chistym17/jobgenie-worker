@@ -68,8 +68,9 @@ def fetch_recommendations(user_email: str):
         embedding = np.mean(embeddings, axis=0).tolist()
     else:
         embedding = []
-    fetched_chunks = search_similar(embedding)
 
+    
+    fetched_chunks = search_similar(embedding)
 
 
     return fetched_chunks
