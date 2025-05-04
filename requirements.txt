@@ -8,3 +8,5 @@ playwright==1.40.0
 fake-useragent
 firecrawl-py
 beautifulsoup4
+gunicorn
+google-generativeai
