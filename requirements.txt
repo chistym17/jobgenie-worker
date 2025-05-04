@@ -10,3 +10,4 @@ firecrawl-py
 beautifulsoup4
 gunicorn
 google-generativeai
+crewai
