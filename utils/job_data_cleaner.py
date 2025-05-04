@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import json
 from typing import Dict, Optional
 import re
-from utils.job_crawler import JobCrawler
+from utils.crawler import JobCrawler
 
 load_dotenv()
 

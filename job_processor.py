@@ -2,8 +2,8 @@
 import time
 import json
 from datetime import datetime
-from utils.job_crawler import JobCrawler
-from utils.llm_processor import JobLLMProcessor
+from utils.crawler import JobCrawler
+from utils.job_data_cleaner import JobLLMProcessor
 from db import fetch_all_jobs
 from utils.embedder import get_embedding
 from utils.qdrant_service import init_collection, insert_document
@@ -35,10 +35,8 @@ class JobProcessor:
 
     def _create_embedding(self, job_data: Dict) -> List[float]:
         """Create embedding from job data"""
-        # Combine title and key information for embedding
         text_to_embed = f"{job_data.get('title', '')} {job_data.get('description', '')}"
         
-        # Get embedding
         embedding = get_embedding(text_to_embed)
         if not embedding:
             self._log("Failed to get embedding")
@@ -68,7 +66,6 @@ class JobProcessor:
             self._log(f"Processing with LLM: {job_title}")
             processed_data = self.llm_processor.process_job_posting(scrape_result)
             
-            # Create embedding
             self._log(f"Creating embedding for: {job_title}")
             embedding = self._create_embedding(processed_data)
             
@@ -80,27 +77,22 @@ class JobProcessor:
                 })
                 return
 
-            # Upload to Qdrant
             self._log(f"Uploading to Qdrant: {job_title}")
             init_collection()
             try:
-                # Create a simple payload with just the title and processed data
                 payload = {
                     'title': job_title,
                     'content': processed_data
                 }
                 
-                # Generate a simple integer ID for Qdrant
-                qdrant_id = hash(job_title) % 1000000  # Simple hash to get an integer
+                qdrant_id = hash(job_title) % 1000000  
                 
-                # Store the embedding as the vector and processed data as payload
                 insert_document(
                     id=qdrant_id,
-                    embedding=embedding,  # This is the vector
-                    payload=payload  # This is the metadata
+                    embedding=embedding,  
+                    payload=payload 
                 )
                 
-                # Save only the essential information
                 self.processed_jobs.append({
                     'title': job_title,
                     'data': processed_data

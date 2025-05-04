@@ -1,8 +1,11 @@
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 def get_mongodb_client():
     """Create and return MongoDB client connection"""
-    client = MongoClient('mongodb://localhost:27018/')
+    client = MongoClient(os.getenv("MONGODB_URI"))
     return client
 
 def fetch_all_jobs():
