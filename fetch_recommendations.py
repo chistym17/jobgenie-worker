@@ -72,7 +72,6 @@ def fetch_recommendations(user_email: str):
     
     fetched_chunks = search_similar(embedding)
 
-
     return fetched_chunks
 
 

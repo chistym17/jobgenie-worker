@@ -1,21 +1,28 @@
-import requests
+import cohere
 import os
 from dotenv import load_dotenv
+import numpy as np
 
 load_dotenv()
 
-HUGGINGFACE_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
+def get_embedding(text):
+    client = cohere.ClientV2(os.getenv('COHERE_API_KEY'))
+    response = client.embed(
+        texts=[text],
+        model="embed-v4.0",
+        input_type="search_query",
+        embedding_types=["float"],
+        truncate="LEFT"
+    )
+    
+    original_embedding = response.embeddings.float[0]
+    
+    if not isinstance(original_embedding, np.ndarray):
+        original_embedding = np.array(original_embedding)
+    
+    reduced_embedding = original_embedding[:384]
+    
+    return reduced_embedding.tolist()  
 
-def get_embedding(text: str) -> list[float]:
-    try:
-        response = requests.post(
-            "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
-            headers={"Authorization": f"Bearer {HUGGINGFACE_TOKEN}"},
-            json={"inputs": text},
-            timeout=30,
-        )
-        response.raise_for_status()
-        return response.json()
-    except Exception as e:
-        print("Embedding error:", e)
-        return []
+
+
