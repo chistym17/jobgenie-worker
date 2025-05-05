@@ -8,6 +8,16 @@ def get_mongodb_client():
     client = MongoClient(os.getenv("MONGODB_URI"))
     return client
 
+def check_mongodb_connection():
+    """Check if MongoDB connection is successful"""
+    try:
+        client = get_mongodb_client()
+        client.close()
+        return True
+    except Exception as e:
+        print(f"MongoDB connection failed: {e}")
+        return False
+
 def fetch_all_jobs():
     """Fetch all jobs from the jobs collection in db-jobgeniem"""
     client = get_mongodb_client()

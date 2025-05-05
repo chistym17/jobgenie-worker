@@ -11,6 +11,15 @@ client = QdrantClient(
 
 COLLECTION_NAME = os.getenv("QDRANT_COLLECTION")
 
+
+def check_qdrant_connection():
+    try:
+        client.get_collections()
+        return True
+    except Exception as e:
+        print(f"Qdrant connection failed: {e}")
+        return False
+
 def init_collection():
     if COLLECTION_NAME not in [c.name for c in client.get_collections().collections]:
         client.recreate_collection(

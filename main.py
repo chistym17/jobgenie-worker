@@ -14,7 +14,8 @@ from crewai import Crew
 from db import fetch_resume_data
 import bson
 import datetime
-
+from db import check_mongodb_connection
+from utils.qdrant_service import check_qdrant_connection
 from fetch_recommendations import resume_cache
 
 app = FastAPI()
@@ -28,6 +29,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/health")
+async def health_check():
+    mongodb_connection = check_mongodb_connection()
+    qdrant_connection = check_qdrant_connection()
+    return {
+        "status": "healthy",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "service": "JobGenie Worker",
+        "mongodb_connection": mongodb_connection,
+        "qdrant_connection": qdrant_connection
+    }
 
 
 
@@ -56,7 +69,6 @@ async def get_recommendations(request: Request):
         data = await request.json()
         user_email = data.get("email", "demouser17@gmail.com")
 
-        # Use cache if available
         if recommended_jobs_cache is not None:
             jobs = recommended_jobs_cache
         else:
