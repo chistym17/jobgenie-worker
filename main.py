@@ -8,8 +8,7 @@ from typing import List, Dict, Any
 from agents.recommender_agent import recommender_agent
 from agents.explainer_agent import explainer_agent
 from agents.resume_advisor_agent import resume_advisor_agent
-from agents.Tasks import create_recommendation_task, create_explanation_task, create_resume_advice_task
-from agents.initialize_crews import run_crew_for_recommendations, run_crew_for_explanation, run_crew_for_advice
+from agents.initialize_crews import run_crew_for_explanation, run_crew_for_advice
 from crewai import Crew
 from db import fetch_resume_data
 import bson
@@ -17,6 +16,9 @@ import datetime
 from db import check_mongodb_connection
 from utils.qdrant_service import check_qdrant_connection
 from fetch_recommendations import resume_cache
+from celery_tasks.recommendation_task import generate_recommendations_task
+from celery.result import AsyncResult
+from celery_app import celery_app
 
 app = FastAPI()
 
@@ -71,42 +73,26 @@ async def get_recommendations(request: Request):
 
         if recommended_jobs_cache is not None:
             jobs = recommended_jobs_cache
+            return {"jobs": jobs, "message": "Recommendation task completed"}
         else:
-            jobs = run_crew_for_recommendations(user_email)
-            recommended_jobs_cache = jobs
+            task = generate_recommendations_task.delay(user_email)
+            recommended_jobs_cache = task
 
-        if not jobs:
-            raise HTTPException(status_code=500, detail="Failed to extract job recommendations.")
+        return {"task_id": task.id, "message": "Recommendation task submitted"}
 
-        return JSONResponse(jobs)
-
+    
     except Exception as e:
         print(f"Error generating recommendations: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.websocket("/ws/recommendations")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    try:
-        data = await websocket.receive_text()
-        email = json.loads(data).get("email", "demouser17@gmail.com")
-        jobs = run_crew_for_recommendations(email)
+@app.get("/recommendations/{task_id}")
+def get_task_result(task_id: str):
+    result = AsyncResult(task_id, app=celery_app)
+    if result.ready():
+        return {"status": "completed", "data": result.result}
+    return {"status": "pending"}
 
-        if not jobs:
-            await websocket.send_text(json.dumps({"error": "Failed to extract job recommendations"}))
-            await websocket.close()
-            return
-
-        for job in jobs:
-            await websocket.send_text(json.dumps(job))
-            await asyncio.sleep(0.1)
-        while True:
-            msg = await websocket.receive_text()
-            await websocket.send_text(json.dumps({"echo": msg}))
-    except Exception as e:
-        print(f"WebSocket error: {e}")
-        await websocket.close()
 
 @app.websocket("/ws/chat")
 async def chat_websocket(websocket: WebSocket):
