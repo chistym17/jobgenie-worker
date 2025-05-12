@@ -47,17 +47,11 @@ def insert_document(id: int, embedding: list[float], payload: dict):
 
 
 def generate_consistent_id(email: str) -> int:
-    """
-    Generate a consistent ID for an email using SHA-256 hash.
-    Returns a positive integer that's deterministic for the same email.
-    """
-    # Create a SHA-256 hash of the email
+   
     hash_object = hashlib.sha256(email.encode())
-    # Convert to integer and take modulo to ensure it's within Qdrant's range
     return int(hash_object.hexdigest(), 16) % (2**63 - 1)
 
 def insert_resume_embedding(embedding: list[float], payload: dict):
-    # Generate a deterministic ID using SHA-256
     resume_id = generate_consistent_id(payload["email"])
   
     try:
@@ -85,10 +79,7 @@ def search_similar(text_embedding: list[float], top_k: int = 5):
     return results
 
 def list_collections():
-    """
-    List all available collections in the Qdrant database.
-    Returns a list of collection names.
-    """
+  
     try:
         collections = client.get_collections()
         print("Available collections:")
@@ -100,21 +91,13 @@ def list_collections():
         return []
 
 def delete_collection(collection_name: str):
-    """
-    Delete a collection from Qdrant database.
-    Args:
-        collection_name (str): Name of the collection to delete
-    Returns:
-        bool: True if deletion was successful, False otherwise
-    """
+
     try:
-        # First check if collection exists
         collections = [c.name for c in client.get_collections().collections]
         if collection_name not in collections:
             print(f"Collection '{collection_name}' does not exist")
             return False
             
-        # Delete the collection
         client.delete_collection(collection_name=collection_name)
         print(f"Successfully deleted collection: {collection_name}")
         return True
@@ -147,18 +130,5 @@ def get_resume_embedding_by_email(user_email: str):
         print(f"[GET] Error retrieving embedding: {e}")
         return None
 
-if __name__ == "__main__":
-    # Test the connection and list collections
-    if check_qdrant_connection():
-        print("Successfully connected to Qdrant!")
-        print("\nAvailable collections:")
-        list_collections()
 
-        result = get_resume_embedding_by_email("demouser17@gmail.com")
-        print(result)
-
-     
-       
-    else:
-        print("Failed to connect to Qdrant")
       
