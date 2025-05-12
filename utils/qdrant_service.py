@@ -153,7 +153,11 @@ if __name__ == "__main__":
         print("Successfully connected to Qdrant!")
         print("\nAvailable collections:")
         list_collections()
-        
+
+        result = get_resume_embedding_by_email("demouser17@gmail.com")
+        print(result)
+
+     
        
     else:
         print("Failed to connect to Qdrant")
