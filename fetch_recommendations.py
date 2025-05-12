@@ -1,10 +1,11 @@
 from db import fetch_all_jobs, fetch_resume_data
 from fastapi import APIRouter
-from utils.qdrant_service import search_similar
+from utils.qdrant_service import search_similar, delete_collection, get_resume_embedding_by_email
 from utils.embedder import get_embedding
 import numpy as np
 import re
-
+import time
+from utils.qdrant_service import insert_resume_embedding
 # In-memory cache for user resumes
 resume_cache = {}
 
@@ -44,37 +45,50 @@ def extract_relevant_resume_text(resume):
     for edu in resume.get('education', []):
         edu_str = f"{edu.get('degree', '')} at {edu.get('institution', '')} ({edu.get('year', '')})"
         parts.append('Education: ' + edu_str)
-    # Certifications (if present)
-    for cert in resume.get('certifications', []):
-        cert_str = cert.get('title', '')
-        if cert_str:
-            parts.append('Certification: ' + cert_str)
+ 
     return '\n'.join(parts)
 
 @router.get("/fetch_recommendations")
 def fetch_recommendations(user_email: str):
-    resume = fetch_resume_data(user_email)
-    if not resume:
-        return []
-        
-    relevant_text = extract_relevant_resume_text(resume)
-    chunks = chunk_text(relevant_text, max_length=500)
-    embeddings = []
-    for chunk in chunks:
-        if chunk.strip():
-            emb = get_embedding(chunk)
-            embeddings.append(emb)
-    if embeddings:
-        embedding = np.mean(embeddings, axis=0).tolist()
-    else:
-        embedding = []
-
     
+    embedding = get_resume_embedding_by_email(user_email)
+    
+    if embedding is None:
+        resume = fetch_resume_data(user_email)
+        if not resume:
+            print("No resume data found")
+            return []
+        
+        relevant_text = extract_relevant_resume_text(resume)
+        chunks = chunk_text(relevant_text, max_length=500)
+        embeddings = []
+        for chunk in chunks:
+            if chunk.strip():
+                emb = get_embedding(chunk)
+                embeddings.append(emb)
+        
+        if embeddings:
+            embedding = np.mean(embeddings, axis=0).tolist()
+            insert_resume_embedding(embedding, {"email": user_email})
+        else:
+            print("Failed to compute embedding from resume chunks")
+            return []
+    else:
+        print("Using precomputed embedding")
+    
+    if not embedding:
+        print("No embedding available for recommendations")
+        return []
     fetched_chunks = search_similar(embedding)
-
     return fetched_chunks
 
-
-
 if __name__ == "__main__":
-    fetch_recommendations("demouser17@gmail.com")
+    start_time = time.time()
+    print("\nStarting recommendation process...")
+    recommendations = fetch_recommendations("demouser17@gmail.com")
+    end_time = time.time()
+    print(f"\nTime taken: {end_time - start_time} seconds")
+    print(f"Found {len(recommendations)} recommendations")
+    if recommendations:
+        print("\nFirst recommendation:")
+        print(recommendations[0])

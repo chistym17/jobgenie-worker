@@ -141,5 +141,35 @@ async def chat_websocket(websocket: WebSocket):
         await websocket.close()
 
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+# @app.post("/compute-embeddings")
+# async def compute_embeddings(request: Request):
+#     """
+#     Endpoint to trigger resume embedding computation
+#     """
+#     try:
+#         data = await request.json()
+#         user_email = data.get("email")
+        
+#         if not user_email:
+#             raise HTTPException(status_code=400, detail="Email is required")
+            
+#         # Check if resume exists
+#         resume = fetch_resume_data(user_email)
+#         if not resume:
+#             raise HTTPException(status_code=404, detail="Resume not found")
+            
+#         # Trigger the background task
+#         task = compute_resume_embedding_task.delay(user_email)
+        
+#         return {
+#             "task_id": task.id,
+#             "message": "Embedding computation task submitted"
+#         }
+        
+#     except Exception as e:
+#         print(f"Error triggering embedding computation: {e}")
+#         raise HTTPException(status_code=500, detail=str(e))
+
+
+# if __name__ == "__main__":
+#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

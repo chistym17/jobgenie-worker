@@ -1,5 +1,3 @@
-
-Thought: I have now retrieved the job recommendations using the fetch_recommendations tool. I must now transform this data into the specific JSON format requested. This involves iterating through the list of `ScoredPoint` objects, extracting relevant information from the `payload` and `content` fields, and constructing a JSON object for each job with the required fields, then assembling them into a JSON array. The Match Score should also be correctly formatted.
 ```json
 [
   {
@@ -7,7 +5,7 @@ Thought: I have now retrieved the job recommendations using the fetch_recommenda
     "Company Name": "Pronto Pilates Pty Ltd",
     "Location": "Remote (Anywhere in the World)",
     "Job Type": "Full-Time",
-    "Salary": null,
+    "Salary": "N/A",
     "Posted Date": "24 days ago",
     "Application Deadline": "May 9th, 2025",
     "Key Requirements": [
@@ -42,9 +40,9 @@ Thought: I have now retrieved the job recommendations using the fetch_recommenda
       "React Native Expo (mobile)"
     ],
     "Description": "Pronto Pilates is a dynamic and innovative tech company that specializes in building a worldwide network of teacher-free (i.e. video-powered) pilates studios. They are looking for a React Native developer to build performant mobile apps on iOS and Android.",
-    "How to Apply": null,
+    "How to Apply": "Apply through the application URL.",
     "Direct Link": "https://vortala.formstack.com/forms/full_stack_developer_apr_2025",
-    "Match Score": 6
+    "Match Score": 68
   },
   {
     "Job Title": "Senior Full Stack Developer",
@@ -78,9 +76,9 @@ Thought: I have now retrieved the job recommendations using the fetch_recommenda
       "Fireblocks"
     ],
     "Description": "AuthentifyIt is a pioneering Web3 company revolutionizing object authentication and connection to digital experiences. We're building a secure, innovative platform bridging physical and digital worlds. We're seeking a highly skilled and experienced Full Stack Developer who is proficient in both frontend and backend development. You’ll play a key role in building and scaling our Web3-enabled platform using modern web technologies. You will work closely with the product officer and key stakeholders to ensure we continue to roll out a high scale web application to some of the biggest brands in the world.",
-    "How to Apply": null,
-    "Direct Link": null,
-    "Match Score": 5
+    "How to Apply": "Email ryan@authentifyit.com with the subject 'Application for Senior Full Stack Developer at AuthentifyIt'",
+    "Direct Link": "N/A",
+    "Match Score": 60
   },
   {
     "Job Title": "Experienced Full-stack Developer",
@@ -99,7 +97,7 @@ Thought: I have now retrieved the job recommendations using the fetch_recommenda
       "Experience with AWS, GCP, or Azure and a core understanding of best practices such as IAM & credential management.",
       "Production experience with PaaS providers such as Heroku, Render, Cloud66, Vercel, or Gigalixir."
     ],
-    "Bonus Skills": null,
+    "Bonus Skills": [],
     "Stack": [
       "JavaScript",
       "Node.js",
@@ -111,9 +109,9 @@ Thought: I have now retrieved the job recommendations using the fetch_recommenda
       "Elixir"
     ],
     "Description": "Sanctuary Computer is building a different type of technology shop with an emphasis on providing clients with comfort and hospitality. They work in design, branding, and engineering roles with clients like Nike, General Electric, The Nobel Prize, Herman Miller, and Adobe. They are looking for a senior developer with experience leading teams and collaborating closely with product owners, eager to practice Value Engineering while solving tough challenges.",
-    "How to Apply": null,
+    "How to Apply": "Apply through the application URL.",
     "Direct Link": "https://garden3d.notion.site/Senior-Full-stack-Developer-de17f758bfe74a9ea7929b0006fab7fc",
-    "Match Score": 4
+    "Match Score": 48
   },
   {
     "Job Title": "Full-Stack Developer (Mid/Senior Level)",
@@ -122,7 +120,7 @@ Thought: I have now retrieved the job recommendations using the fetch_recommenda
     "Job Type": "Full-Time",
     "Salary": "$75,000 - $100,000, based on experience",
     "Posted Date": "17 hours ago",
-    "Application Deadline": null,
+    "Application Deadline": "N/A",
     "Key Requirements": [
       "Strong proficiency in Laravel framework and PHP",
       "Experience with JavaScript and jQuery for frontend interactivity",
@@ -133,7 +131,7 @@ Thought: I have now retrieved the job recommendations using the fetch_recommenda
       "Experience with cloud infrastructure (AWS/DigitalOcean)",
       "Ability to work independently in a remote environment"
     ],
-    "Bonus Skills": null,
+    "Bonus Skills": [],
     "Stack": [
       "HTML/CSS",
       "JavaScript",
@@ -146,8 +144,8 @@ Thought: I have now retrieved the job recommendations using the fetch_recommenda
     ],
     "Description": "Lendr is a Loan Management software company helping real estate private/hard money lenders streamline their lending operations. Our platform enables efficient loan processing, management, and monitoring through intuitive interfaces and powerful backend systems.\nWe're seeking an experienced full-stack developer to join our remote team and contribute to the ongoing development and enhancement of our loan management platform. Experience in the Mortgage/Lending industry is a plus, but by no means required.",
     "How to Apply": "Please submit your resume, portfolio/GitHub, and a brief description of your experience with similar tech stacks to bryce@joinlendr.com.",
-    "Direct Link": null,
-    "Match Score": 3
+    "Direct Link": "N/A",
+    "Match Score": 31
   },
   {
     "Job Title": "Senior Full Stack Engineer (Ruby on Rails/React)",
@@ -185,8 +183,8 @@ Thought: I have now retrieved the job recommendations using the fetch_recommenda
     ],
     "Description": "Learning Tapestry is a fully remote global organization focused on making digital learning 'just work'. They are a triple bottom line company focusing on profit, social impact, and a healthy work environment with flexible work arrangements.",
     "How to Apply": "Apply with your resume and a cover letter. Include the days and times you plan to work (in US CST) and your hourly rate (in USD) in your cover letter.",
-    "Direct Link": null,
-    "Match Score": 2
+    "Direct Link": "N/A",
+    "Match Score": 27
   }
 ]
 ```
