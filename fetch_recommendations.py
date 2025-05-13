@@ -4,10 +4,7 @@ from utils.qdrant_service import search_similar, delete_collection, get_resume_e
 from utils.embedder import get_embedding
 import numpy as np
 import re
-import time
 from utils.qdrant_service import insert_resume_embedding
-# In-memory cache for user resumes
-resume_cache = {}
 
 router = APIRouter()
 
@@ -27,21 +24,16 @@ def chunk_text(text, max_length=500):
     return chunks
 
 def extract_relevant_resume_text(resume):
-    # Extract main fields for embedding
     parts = []
-    # Skills
     skills = resume.get('skills', [])
     if skills:
         parts.append('Skills: ' + ', '.join(skills))
-    # Experience
     for exp in resume.get('experience', []):
         exp_str = f"{exp.get('position', '')} at {exp.get('company', '')}. {exp.get('description', '')} ({exp.get('duration', '')})"
         parts.append('Experience: ' + exp_str)
-    # Projects
     for proj in resume.get('projects', []):
         proj_str = f"{proj.get('title', '')} ({proj.get('tech_stack', '')}): {proj.get('description', '')}"
         parts.append('Project: ' + proj_str)
-    # Education (if present)
     for edu in resume.get('education', []):
         edu_str = f"{edu.get('degree', '')} at {edu.get('institution', '')} ({edu.get('year', '')})"
         parts.append('Education: ' + edu_str)
@@ -82,13 +74,3 @@ def fetch_recommendations(user_email: str):
     fetched_chunks = search_similar(embedding)
     return fetched_chunks
 
-if __name__ == "__main__":
-    start_time = time.time()
-    print("\nStarting recommendation process...")
-    recommendations = fetch_recommendations("demouser17@gmail.com")
-    end_time = time.time()
-    print(f"\nTime taken: {end_time - start_time} seconds")
-    print(f"Found {len(recommendations)} recommendations")
-    if recommendations:
-        print("\nFirst recommendation:")
-        print(recommendations[0])

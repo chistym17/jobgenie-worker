@@ -4,7 +4,7 @@ celery_app = Celery(
     'jobgenie',
     broker='redis://localhost:6379/0',
     backend='redis://localhost:6379/0',
-    include=['celery_tasks.recommendation_task']
+    include=['celery_tasks.recommendation_task', 'celery_tasks.precompute_embedding']
 )
 
 # Optional configuration

@@ -17,3 +17,5 @@ langchain_google_genai
 numpy
 pydantic
 cohere
+celery
+redis

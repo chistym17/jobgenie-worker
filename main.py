@@ -2,21 +2,15 @@ from fastapi import FastAPI, WebSocket, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-import asyncio
 import json
-from typing import List, Dict, Any
-from agents.recommender_agent import recommender_agent
-from agents.explainer_agent import explainer_agent
-from agents.resume_advisor_agent import resume_advisor_agent
 from agents.initialize_crews import run_crew_for_explanation, run_crew_for_advice
 from crewai import Crew
 from db import fetch_resume_data
-import bson
 import datetime
 from db import check_mongodb_connection
 from utils.qdrant_service import check_qdrant_connection
-from fetch_recommendations import resume_cache
 from celery_tasks.recommendation_task import generate_recommendations_task
+from celery_tasks.precompute_embedding import precompute_resume_embedding_task
 from celery.result import AsyncResult
 from celery_app import celery_app
 
@@ -76,7 +70,6 @@ async def get_recommendations(request: Request):
             return {"jobs": jobs, "message": "Recommendation task completed"}
         else:
             task = generate_recommendations_task.delay(user_email)
-            recommended_jobs_cache = task
 
         return {"task_id": task.id, "message": "Recommendation task submitted"}
 
@@ -88,10 +81,37 @@ async def get_recommendations(request: Request):
 
 @app.get("/recommendations/{task_id}")
 def get_task_result(task_id: str):
-    result = AsyncResult(task_id, app=celery_app)
-    if result.ready():
-        return {"status": "completed", "data": result.result}
-    return {"status": "pending"}
+    try:
+        result = AsyncResult(task_id, app=celery_app)
+        
+        # For pending/running tasks, only return status
+        if not result.ready():
+            return {
+                "status": "pending",
+                "task_id": task_id
+            }
+            
+        # For completed tasks, check if there was an error
+        if result.failed():
+            return {
+                "status": "failed",
+                "error": str(result.result)  # This will be the exception message
+            }
+            
+        # For successful tasks, return only the processed data
+        if result.successful():
+            # Assuming result.result is your list of job recommendations
+            # If it's not already a clean dict/list, you might need to process it
+            return {
+                "status": "completed",
+                "data": result.result
+            }
+            
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e)
+        }
 
 
 @app.websocket("/ws/chat")
@@ -141,35 +161,50 @@ async def chat_websocket(websocket: WebSocket):
         await websocket.close()
 
 
-# @app.post("/compute-embeddings")
-# async def compute_embeddings(request: Request):
-#     """
-#     Endpoint to trigger resume embedding computation
-#     """
-#     try:
-#         data = await request.json()
-#         user_email = data.get("email")
+@app.post("/precompute-embedding")
+async def trigger_precompute_embedding(request: Request):
+    """
+    Endpoint to trigger precomputation of resume embeddings.
+    """
+    try:
+        data = await request.json()
+        user_email = data.get("email")
         
-#         if not user_email:
-#             raise HTTPException(status_code=400, detail="Email is required")
+        if not user_email:
+            raise HTTPException(status_code=400, detail="Email is required")
             
-#         # Check if resume exists
-#         resume = fetch_resume_data(user_email)
-#         if not resume:
-#             raise HTTPException(status_code=404, detail="Resume not found")
+        task = precompute_resume_embedding_task.delay(user_email)
+        return {"task_id": task.id, "message": "Embedding precomputation task submitted"}
+        
+    except Exception as e:
+        print(f"Error triggering embedding precomputation: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/precompute-embedding/{task_id}")
+async def get_precompute_status(task_id: str):
+    """
+    Endpoint to check the status of a precomputation task.
+    """
+    try:
+        task_result = AsyncResult(task_id, app=celery_app)
+        if task_result.ready():
+            if task_result.successful():
+                result = task_result.result
+                if result:
+                    return {"status": "completed", "result": result}
+                else:
+                    return {"status": "failed", "error": "No embedding was generated"}
+            else:
+                return {"status": "failed", "error": str(task_result.result)}
+        else:
+            return {"status": "processing"}
             
-#         # Trigger the background task
-#         task = compute_resume_embedding_task.delay(user_email)
-        
-#         return {
-#             "task_id": task.id,
-#             "message": "Embedding computation task submitted"
-#         }
-        
-#     except Exception as e:
-#         print(f"Error triggering embedding computation: {e}")
-#         raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error checking precomputation status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-# if __name__ == "__main__":
-#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)

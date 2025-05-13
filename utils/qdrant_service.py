@@ -129,6 +129,12 @@ def get_resume_embedding_by_email(user_email: str):
     except Exception as e:
         print(f"[GET] Error retrieving embedding: {e}")
         return None
+    
+
+if __name__ == "__main__":
+    list_collections()
+    result = get_resume_embedding_by_email("demouser17@gmail.com")
+    print(result)
 
 
       
