@@ -1,21 +1,11 @@
-from fastapi import FastAPI, WebSocket, Request, HTTPException
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
-import asyncio
 import json
-from typing import List, Dict, Any
 from agents.recommender_agent import recommender_agent
 from agents.explainer_agent import explainer_agent
 from agents.resume_advisor_agent import resume_advisor_agent
 from agents.Tasks import create_recommendation_task, create_explanation_task, create_resume_advice_task
 from utils.funcs import clean_crew_output, sanitize_resume
 from crewai import Crew
-from db import fetch_resume_data
-import bson
-import datetime
 
-from fetch_recommendations import resume_cache
 
 
 

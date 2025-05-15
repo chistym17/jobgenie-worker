@@ -2,21 +2,17 @@ from fastapi import FastAPI, WebSocket, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-import asyncio
 import json
-from typing import List, Dict, Any
-from agents.recommender_agent import recommender_agent
-from agents.explainer_agent import explainer_agent
-from agents.resume_advisor_agent import resume_advisor_agent
-from agents.Tasks import create_recommendation_task, create_explanation_task, create_resume_advice_task
-from agents.initialize_crews import run_crew_for_recommendations, run_crew_for_explanation, run_crew_for_advice
+from agents.initialize_crews import run_crew_for_explanation, run_crew_for_advice
 from crewai import Crew
 from db import fetch_resume_data
-import bson
 import datetime
 from db import check_mongodb_connection
 from utils.qdrant_service import check_qdrant_connection
-from fetch_recommendations import resume_cache
+from celery_tasks.recommendation_task import generate_recommendations_task
+from celery_tasks.precompute_embedding import precompute_resume_embedding_task
+from celery.result import AsyncResult
+from celery_app import celery_app
 
 app = FastAPI()
 
@@ -71,42 +67,52 @@ async def get_recommendations(request: Request):
 
         if recommended_jobs_cache is not None:
             jobs = recommended_jobs_cache
+            return {"jobs": jobs, "message": "Recommendation task completed"}
         else:
-            jobs = run_crew_for_recommendations(user_email)
-            recommended_jobs_cache = jobs
+            task = generate_recommendations_task.delay(user_email)
 
-        if not jobs:
-            raise HTTPException(status_code=500, detail="Failed to extract job recommendations.")
+        return {"task_id": task.id, "message": "Recommendation task submitted"}
 
-        return JSONResponse(jobs)
-
+    
     except Exception as e:
         print(f"Error generating recommendations: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.websocket("/ws/recommendations")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
+@app.get("/recommendations/{task_id}")
+def get_task_result(task_id: str):
     try:
-        data = await websocket.receive_text()
-        email = json.loads(data).get("email", "demouser17@gmail.com")
-        jobs = run_crew_for_recommendations(email)
-
-        if not jobs:
-            await websocket.send_text(json.dumps({"error": "Failed to extract job recommendations"}))
-            await websocket.close()
-            return
-
-        for job in jobs:
-            await websocket.send_text(json.dumps(job))
-            await asyncio.sleep(0.1)
-        while True:
-            msg = await websocket.receive_text()
-            await websocket.send_text(json.dumps({"echo": msg}))
+        result = AsyncResult(task_id, app=celery_app)
+        
+        # For pending/running tasks, only return status
+        if not result.ready():
+            return {
+                "status": "pending",
+                "task_id": task_id
+            }
+            
+        # For completed tasks, check if there was an error
+        if result.failed():
+            return {
+                "status": "failed",
+                "error": str(result.result)  # This will be the exception message
+            }
+            
+        # For successful tasks, return only the processed data
+        if result.successful():
+            # Assuming result.result is your list of job recommendations
+            # If it's not already a clean dict/list, you might need to process it
+            return {
+                "status": "completed",
+                "data": result.result
+            }
+            
     except Exception as e:
-        print(f"WebSocket error: {e}")
-        await websocket.close()
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
 
 @app.websocket("/ws/chat")
 async def chat_websocket(websocket: WebSocket):
@@ -155,5 +161,50 @@ async def chat_websocket(websocket: WebSocket):
         await websocket.close()
 
 
+@app.post("/precompute-embedding")
+async def trigger_precompute_embedding(request: Request):
+    """
+    Endpoint to trigger precomputation of resume embeddings.
+    """
+    try:
+        data = await request.json()
+        user_email = data.get("email")
+        
+        if not user_email:
+            raise HTTPException(status_code=400, detail="Email is required")
+            
+        task = precompute_resume_embedding_task.delay(user_email)
+        return {"task_id": task.id, "message": "Embedding precomputation task submitted"}
+        
+    except Exception as e:
+        print(f"Error triggering embedding precomputation: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/precompute-embedding/{task_id}")
+async def get_precompute_status(task_id: str):
+    """
+    Endpoint to check the status of a precomputation task.
+    """
+    try:
+        task_result = AsyncResult(task_id, app=celery_app)
+        if task_result.ready():
+            if task_result.successful():
+                result = task_result.result
+                if result:
+                    return {"status": "completed", "result": result}
+                else:
+                    return {"status": "failed", "error": "No embedding was generated"}
+            else:
+                return {"status": "failed", "error": str(task_result.result)}
+        else:
+            return {"status": "processing"}
+            
+    except Exception as e:
+        print(f"Error checking precomputation status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)

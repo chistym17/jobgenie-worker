@@ -5,7 +5,7 @@ from datetime import datetime
 from utils.crawler import JobCrawler
 from utils.job_data_cleaner import JobLLMProcessor
 from db import fetch_all_jobs
-from utils.embedder import get_embedding
+from utils.local_embedder import get_embedding
 from utils.qdrant_service import init_collection, insert_document
 import asyncio
 from typing import Dict, List
